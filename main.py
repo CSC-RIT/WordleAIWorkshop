@@ -1,5 +1,6 @@
 from collections import Counter, defaultdict
-from math import log2
+from math import log2, inf
+from tqdm import tqdm
 import random
 
 def load_allowed_words():
@@ -76,7 +77,13 @@ def get_pattern_counts(guess_word, secret_words):
     the number of words that result in the pattern when guess_word is guessed
     """
 
-    pass
+    patterns = defaultdict(int)
+
+    for secret_word in secret_words:
+        pattern = get_pattern(guess_word, secret_word)
+        patterns[pattern] += 1
+    
+    return patterns
 
 
 def calculate_entropy(guess_word, secret_words):
@@ -89,7 +96,17 @@ def calculate_entropy(guess_word, secret_words):
     return - the total entropy of the guess_word
     """
 
-    pass
+    n = len(secret_words)
+    
+    patterns = get_pattern_counts(guess_word, secret_words)
+
+    entropy = 0
+
+    for count in patterns.values():
+        probability = count / n
+        entropy += probability * log2(1 / probability)
+    
+    return entropy
 
 
 def get_best_guess(words):
@@ -101,7 +118,17 @@ def get_best_guess(words):
     return - the word representing the best guess
     """
 
-    pass
+    best_entropy = -inf
+    best_word = None
+
+    for guess_word in tqdm(words):
+        entropy = calculate_entropy(guess_word, words)
+
+        if entropy > best_entropy:
+            best_entropy = entropy
+            best_word = guess_word
+    
+    return best_word
 
 
 def get_words_with_pattern(guess_word, words, pattern):
@@ -115,7 +142,13 @@ def get_words_with_pattern(guess_word, words, pattern):
     return - a list of words that result in pattern when guess_word is guessed
     """
 
-    pass
+    possible = []
+
+    for secret_word in words:
+        if get_pattern(guess_word, secret_word) == pattern:
+            possible.append(secret_word)
+    
+    return possible
 
 
 def main():
@@ -123,14 +156,17 @@ def main():
 
     # loop until we get the answer
     while True:
-        return
 
         # 1. get the best guess
+        best_guess = get_best_guess(words)
+
+        print(f'best guess: {best_guess}')
 
         # 2. play the guess on Wordle; then give the program the pattern
+        pattern = input('pattern received:\n> ')
 
         # 3. get the list of remaining valid words
-        
+        words = get_words_with_pattern(best_guess, words, pattern)
 
 
 if __name__ == '__main__':

@@ -45,25 +45,28 @@ def get_pattern(guess_word, secret_word):
 
     return - a pattern representing the result of the guess against the secret
     """
-    pattern = ''
+    pattern = [''] * 5
 
     guess_counts = defaultdict(int)
     secret_counts = Counter(secret_word)
 
-    for guess_letter, secret_letter in zip(guess_word, secret_word):
+    for i, (guess_letter, secret_letter) in enumerate(zip(guess_word, secret_word)):
         if guess_letter == secret_letter:
-            pattern += 'G'
+            pattern[i] = 'G'
             guess_counts[guess_letter] += 1
             continue
-    
+
+    for i, (guess_letter, secret_letter) in enumerate(zip(guess_word, secret_word)):
+        if pattern[i] == 'G':
+            continue
+
         if guess_counts[guess_letter] < secret_counts.get(guess_letter, 0):
-            pattern += 'Y'
+            pattern[i] = 'Y'
             guess_counts[guess_letter] += 1
-            continue
+        else:
+            pattern[i] = 'B'
     
-        pattern += 'B'
-    
-    return pattern
+    return ''.join(pattern)
 
 
 def get_pattern_counts(guess_word, secret_words):
